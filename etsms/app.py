@@ -20,3 +20,11 @@ app.conf.beat_schedule = {
         'schedule': crontab(minute=0, hour=6),
     },
 }
+
+
+# app.conf.beat_schedule = {
+#     'send-to-usa': {
+#         'task': 'etsms.tasks.sms.send_all_sms_for_today',
+#         'schedule': 60.0,
+#     },
+# }

@@ -30,13 +30,10 @@ def get_google_sheet() -> gspread.models.Spreadsheet:
     return google_sheet
 
 
-def get_google_data(row_id: int = None) -> list:
+def get_google_data(sheet_id: int, row_id: int) -> list:
     google_sheet = get_google_sheet()
-    worksheet = google_sheet.sheet1
-    if row_id is None:
-        data = worksheet.get_all_values()
-    else:
-        data = worksheet.row_values(row_id)
+    worksheet = google_sheet.get_worksheet(sheet_id)
+    data = worksheet.row_values(row_id)
     return data
 
 
@@ -101,9 +98,15 @@ def should_send_ethiopia_sms(row: list) -> bool:
     return should_send
 
 
-def get_record_numbers(validator):
-    data = get_google_data()
-    matches = [i for i, row in enumerate(data, start=1) if validator(row)]
+def get_matching_records(validator):
+    google_sheet = get_google_sheet()
+    worksheets = google_sheet.worksheets()
+    matches = []
+    for i, sheet in enumerate(worksheets):
+        if sheet.title.startswith('scheduled_'):
+            data = sheet.get_all_values()
+            these_matches = [j for j, row in enumerate(data, start=1) if validator(row)]
+            matches.extend((i, j) for j in these_matches)
     return matches
 
 
